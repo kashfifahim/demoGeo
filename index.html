@@ -5,45 +5,78 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="styles.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+        integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+        crossorigin="" />
+
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+        integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+        crossorigin=""></script>
     <title>GeoLocation Demo</title>
 </head>
 
 <body>
     <h1>Geolocation</h1>
+    <div id="map"></div>
     <p>
-        <span id="success"></span>
-        <span id="failed"></span>
+        <span id="message"></span>
     </p>
 
     <script>
 
-        let options = {
-            enableHighAccuracy: true,
-            timeout: 5000,
-            maximumAge: 0
-        };
+        let map = L.map('map').fitWorld();
+        const attirbution = 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery © <a href="https://www.mapbox.com/">Mapbox</a>';
+        const tileUrl = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer(tileUrl, attirbution).addTo(map);
 
-        function success(pos) {
-            let crd = pos.coords;
 
-            document.getElementById('success').textContent = `
-                Your current position is: ${crd.latitude}, ${crd.longitude}.
-                More or less ${crd.accuracy} meters.
-            `;
-            // console.log('Your current position is:');
-            // console.log(`Latitude : ${crd.latitude}`);
-            // console.log(`Longitude: ${crd.longitude}`);
-            // console.log(`More or less ${crd.accuracy} meters.`);
+        function onLocationFound(e) {
+            var radius = e.accuracy;
+
+            L.marker(e.latlng).addTo(map)
+                .bindPopup("You are within " + radius + " meters from this point").openPopup();
+
+            L.circle(e.latlng, radius).addTo(map);
+        }
+        function onLocationError(e) {
+            alert(e.message);
         }
 
-        function error(err) {
-            document.getElementById('success').textContent = `
-                ${err.code}): ${err.message}
-            `;
-            console.warn(`ERROR(${err.code}): ${err.message}`);
-        }
+        map.locate({ setView: true, maxZoom: 16 });
+        map.on('locationerror', onLocationError);
+        map.on('locationfound', onLocationFound);
 
-        navigator.geolocation.getCurrentPosition(success, error, options);
+        // let options = {
+        //     enableHighAccuracy: true,
+        //     timeout: 5000,
+        //     maximumAge: 0
+        // };
+
+        // function success(pos) {
+        //     let crd = pos.coords;
+
+        //     document.getElementById('message').textContent = `
+        //         Your current position is: ${crd.latitude}, ${crd.longitude}.
+        //         More or less ${crd.accuracy} meters.
+        //     `;
+
+
+        //     // console.log('Your current position is:');
+        //     // console.log(`Latitude : ${crd.latitude}`);
+        //     // console.log(`Longitude: ${crd.longitude}`);
+        //     // console.log(`More or less ${crd.accuracy} meters.`);
+        // }
+
+        // function error(err) {
+        //     document.getElementById('message').textContent = `
+        //         ${err.code}): ${err.message}
+        //     `;
+        //     console.warn(`ERROR(${err.code}): ${err.message}`);
+        // }
+
+        // navigator.geolocation.getCurrentPosition(success, error, options);
 
     </script>
 </body>
