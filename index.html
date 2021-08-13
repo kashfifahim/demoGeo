@@ -11,21 +11,40 @@
 <body>
     <h1>Geolocation</h1>
     <p>
-        <label for="long">Longitude: </label>
-        <span id="long"></span>
-        </br>
-        <label for="lat">Latitude: </label>
-        <span id="lat"></span>
+        <span id="success"></span>
+        <span id="failed"></span>
     </p>
 
     <script>
-        if ('geolocation' in navigator) {
-            /* geolocation is available */
-            console.log("Success")
-        } else {
-            /* geolocation IS NOT available */
-            console.log("Nope")
+
+        let options = {
+            enableHighAccuracy: true,
+            timeout: 5000,
+            maximumAge: 0
+        };
+
+        function success(pos) {
+            let crd = pos.coords;
+
+            document.getElementById('success').textContent = `
+                Your current position is: ${crd.latitude}, ${crd.longitude}.
+                More or less ${crd.accuracy} meters.
+            `;
+            // console.log('Your current position is:');
+            // console.log(`Latitude : ${crd.latitude}`);
+            // console.log(`Longitude: ${crd.longitude}`);
+            // console.log(`More or less ${crd.accuracy} meters.`);
         }
+
+        function error(err) {
+            document.getElementById('success').textContent = `
+                ${err.code}): ${err.message}
+            `;
+            console.warn(`ERROR(${err.code}): ${err.message}`);
+        }
+
+        navigator.geolocation.getCurrentPosition(success, error, options);
+
     </script>
 </body>
 
